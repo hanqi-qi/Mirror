@@ -18,10 +18,12 @@ Please cite our paper and kindly give a star for this repository if you use this
 
 For ChatGPT, we use the following command to evaluate the model:
 
-```python main.py -dataset_name social --ckpt_dir "gpt35" --model_type openai --max_tree_depth 3 --action_num 3 --self_consistency 5 --start_eid 0 --end_eid 100 --advice_type gene_demo --header_type 0  --n_trials 3  --cut_prob 0.8
+```
+python main.py -dataset_name social --ckpt_dir "gpt35" --model_type openai --max_tree_depth 3 --action_num 3 --self_consistency 5 --start_eid 0 --end_eid 100 --advice_type gene_demo --header_type 0  --n_trials 3  --cut_prob 0.8
 ```
 
-For llama or vicuna, we use the following command to evaluate the model:
+For Llama2 or Vicuna, we use the following command to evaluate the model:
 
-```python main.py -dataset_name social --ckpt_dir your_llama_path --model_type llama --max_tree_depth 3 --action_num 3 --self_consistency 5 --start_eid 0 --end_eid 100 --advice_type gene_demo --header_type 0  --n_trials 3  --cut_prob 0.4
+```
+python main.py -dataset_name social --ckpt_dir your_llama_path --model_type llama --max_tree_depth 3 --action_num 3 --self_consistency 5 --start_eid 0 --end_eid 100 --advice_type gene_demo --header_type 0  --n_trials 3  --cut_prob 0.4
 ```
