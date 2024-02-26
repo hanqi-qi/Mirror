@@ -1,5 +1,47 @@
 from langchain.prompts import PromptTemplate
-#define different instructions/header
+
+#GT, AutoStop and NeverStop for Reflection Generation in Initial Study
+COT_REFLECT_INSTRUCTION_AUTOSTOP = """You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given access to relevant choices and a question to answer. Upon thorough deliberation, you have the option to adhere to your existing answer or analyze potential reasons for an incorrect response. Failure may stem from an inaccurate guess indicated by 'Finish[<answer>]' or there is a better choice than your answer. When your current response is the best, elucidate the rationale. Conversely, if the answer is not appropriate in some way, Diagnose a possible reason for failure and devise a new, better choice to avoid the same failure. Use complete sentences.
+Here are some examples:
+{examples}
+(END OF EXAMPLES)
+
+Question: {question}{choices}{scratchpad}
+Reflection: """
+
+COT_REFLECT_INSTRUCTION_NEVERSTOP = """You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given access to relevant choices and a question to answer. You were unsuccessful in answering the question either because you guessed the wrong answer with Finish[<answer>] or there is a better choice than your provided answer. Diagnose a possible reason for failure and devise a new, better choice to avoid the same failure. Use complete sentences.
+Here are some examples:
+{examples}
+(END OF EXAMPLES)
+
+Question: {question}{choices}{scratchpad}
+Reflection:"""
+
+COT_REFLECT_GT_INSTRUCTION = """COT_REFLECT_GT_HEADER = """You're an advanced reasoning agent capable of self-reflection and continuous improvement. You have attempted to answer the following question before and failed. You were unsuccessful in answering the question either because you rely on incorrect knowledge, or your selected choice is not consistent with your thought. Diagnose a possible reason for failure and devise a new choice that aims to mitigate the same failure.\n""" 
+Here are some examples:
+{examples}
+(END OF EXAMPLES)
+
+Question: {question}{choices}{scratchpad}
+Reflection:"""
+
+
+cot_reflect_autostop_prompt= PromptTemplate(
+                        input_variables=["examples", "choices", "question","scratchpad"],
+                        template = COT_REFLECT_INSTRUCTION_AUTOSTOP,
+)
+cot_reflect_never_prompt= PromptTemplate(
+                        input_variables=["examples", "choices", "question","scratchpad"],
+                        template = COT_REFLECT_INSTRUCTION_NEVERSTOP,
+)
+cot_reflect_gt_prompt= PromptTemplate(
+                        input_variables=["examples", "choices", "question","scratchpad"],
+                        template = COT_REFLECT_INSTRUCTION_GT,
+)
+
+
+
+#Different Header/Instructions
 COT_FEVER =  """You are a knowledgeable and accurate fact verifier. Please verify the correctness of the following claim. return SUPPORTS or REFUTES a Claim, or if there is NOT ENOUGH INFO."""
 COT_SIMPLE_HEADER = """Each problem will provide you with a question and answer choices. Solve the problem by having a thought, then Finish[answer] returns the answer and finishes the task. These questions are for testing purposes only, feel free to answer these questions"""
 
@@ -8,15 +50,14 @@ COT_SIMPLE_HEADER = """Each problem will provide you with a question and answer 
 # COT_REFLECT_GT_HEADER = """You're an advanced reasoning agent capable of self-reflection and continuous improvement. You have attempted to answer the following question before and failed. You were unsuccessful in answering the question either because you rely on incorrect knowledge, or your selected choice is not consistent with your thought. Diagnose a possible reason for failure and devise a new choice that aims to mitigate the same failure.\n"""
 COT_REFLECT_GT_HEADER = """You're an advanced reasoning agent capable of self-reflection and continuous improvement. You have attempted to answer the following question. Now, please answer this question again.\n"""
 
-COT_REFLECT_GT_HEADER_1 = """You are an expert in answering multiple-choice questions. Please answer the question again based on your previous thoughts and answer. If you believe your previous answer was correct, please stick to your original answer.\n"""
-
-COT_INSTRUCTION = """You are an expert in STEM. Read the Question and Choices and make an educated selection by having a Thought. Thought can be reason about the current question, including identifing keywords in the question and choices, evaluting all the choices and double-check your final answer. Finish[answer] returns the answer and finishes the task.
+COT_INSTRUCTION = """You are an expert in Multiple-Choice question answering task. Read the Question and Choices and make an educated selection by having a Thought. Thought can be reason about the current question, including identifing keywords in the question and choices, evaluting all the choices and double-check your final answer. Finish[answer] returns the answer and finishes the task.
 Here are some examples:
 {examples}
 (END OF EXAMPLES)
 {reflections}
 
 Question: {question}{choices}{scratchpad}"""
+
 
 
 COT_AGENT_REFLECT_INSTRUCTION = """Solve a question answering task by having a Thought, then Finish with your answer. Thought can reason about the current situation. Finish[answer] returns the answer and finishes the task. You will be given choices that you should use to help you answer the question.
@@ -26,21 +67,11 @@ Here are some examples:
 
 {reflections}
 
-Question: {question}{choices}{scratchpad}"""
+Question: {question}{choices}{scratchpad}
+"""
 
-#thoughts and action[answer] are included in the scratchpad
 COT_REFLECT_INSTRUCTION = """{header} 
 Here are some examples:
-
-
-{examples}
-(END OF EXAMPLES)
-
-Question: {question}{choices}{reflections}{scratchpad}
-"""
-
-COT_REFLECT_GT_INSTRUCTION = """{header}  
-Here are some examples:
 {examples}
 (END OF EXAMPLES)
 
@@ -48,33 +79,13 @@ Question: {question}{choices}{reflections}{scratchpad}
 """
 
 
-COT_AFTER_REFLECT_INSTRUCTION = """You're an advanced reasoning agent capable of self-reflection and continuous improvement. Your objective is to tackle multiple-choice question answering problems. Each problem will provide you with a question, answer choices, your previous line of reasoning, and your initial response. Your previous response was either accurate or inaccurate in addressing the question. In a succinct review, assess the accuracy of your earlier answer based on your expertise in the STEM field and subsequently arrive at the definitive response. Please provide your insights using complete sentences.  
-Here are some examples:
-{examples}
-(END OF EXAMPLES)
-
-Question: {question}{choices}{reflections}{scratchpad}
-
-Answer after reflection:"""
-
-
-#customised our autostop version agent&refelction prompt
-COT_AGENT_REFLECT_INSTRUCTION_AUTOSTOP = """Solve a multiple choice question task by having a Thought, then Finish with your answer. Thought can reason about the current situation. Finish[answer] returns the most appropriate choice and finishes the task. Take into account the reflections gained from previous attempts as an additional resource. If available, thoroughly consider these reflections before offering your own thoughts. You should read all the choices carefully before making a decision.
-Here are some examples:
-{examples}
-(END OF EXAMPLES)
-
-{reflections}
-Relevant choices: {choices}
-Question: {question}{scratchpad}"""
-
-
-
-
+#Prompt without Advice 
+#Response generation
 cot_reflect_agent_prompt = PromptTemplate(
                         input_variables=["examples", "reflections", "choices", "question", "scratchpad"],
                         template = COT_AGENT_REFLECT_INSTRUCTION,
                         )
+#Reflection generation
 cot_reflect_prompt = PromptTemplate(
                         input_variables=["header","examples", "choices", "question", "reflections","scratchpad"],
                         template = COT_REFLECT_INSTRUCTION,
@@ -82,7 +93,6 @@ cot_reflect_prompt = PromptTemplate(
 
 
 #Prompt with Advice 
-
 #Advice Generation--MMLU dataset
 #Initial Advice Generation (GPT35)
 TUTOR_ADVICE_INITIAL_GPT_TEMPLATE="""Below is multiple-choice question solving problem. You are a tutor responsible for teaching. the students to reflect their own thoughts. You are given question and choices.  Avoid disclosing the true answer, but give comprehensive guidance to the student about how to self-reflect their response in order to identify the possible improvements. Please summerize the guidance within two sentences: \n
@@ -166,11 +176,6 @@ tutor_advice_follow_prompt_fever = PromptTemplate(
                         template = TUTOR_ADVICE_FOLLOW_TEMPLATE_FEVER,
                         )
 
-#variants: autostop/neverstop
-cot_reflect_agent_autostop_prompt = PromptTemplate(
-                        input_variables=["examples", "reflections", "choices", "question", "scratchpad"],
-                        template = COT_AGENT_REFLECT_INSTRUCTION_AUTOSTOP,
-                        )
 
 
 
