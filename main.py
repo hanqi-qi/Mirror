@@ -139,7 +139,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_type', default="openai", type=str, required=False)
     parser.add_argument('--start_eid', default=0, type=int, required=False)
     parser.add_argument('--end_eid', default=1, type=int, required=False)
-    parser.add_argument('--dataset_name', default="stem", type=str, required=False)
+    parser.add_argument('--dataset_name', default="other", type=str, required=False)
 
     parser.add_argument('--n_trials', default=3, type=int, required=False, help='repeat n_trials times')
     parser.add_argument('--max_tree_depth', default=3, type=int, required=False, help='max_tree_depth')
