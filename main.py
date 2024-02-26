@@ -12,7 +12,7 @@ from agents_module import CoTAgent
 from evaluate import cut_tree_final
 from prompt import tutor_agent_prompt_fever, tutor_reflect_prompt_fever, tutor_agent_prompt, tutor_reflect_prompt
 from demonstration import TUTOR_REFLECTION_STEM, TUTOR_STEM,  TUTOR_STEM_NOADVCIE, COT_FEVER,TUTOR_REFLECTION_FEVER
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = ""
 
 
 
