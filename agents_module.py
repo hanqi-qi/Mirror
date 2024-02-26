@@ -2,16 +2,13 @@ import re, string, os
 import copy
 import random
 import tiktoken
-import openai
 import time
 from typing import List
 from model import llm_generate
 from langchain.prompts import PromptTemplate
-from prompts import REFLECTION_HEADER, LAST_TRIAL_HEADER, \
-    COT_REFLECT_GT_HEADER, COT_FEVER,tutor_advice_follow_prompt_fever,tutor_advice_initial_prompt_fever,REFLECT_HEADER
-from prompts import cot_agent_prompt, cot_reflect_prompt, tutor_advice_initial_prompt, tutor_advice_follow_prompt, \
-    tutor_advice_initial_gpt_prompt, tutor_advice_follow_gpt_prompt, COT_SIMPLE_HEADER,COT_REFLECT_GT_HEADER_1,COT_REFLECT_GT_HEADER_2
-from demonstration import COT_REFLECTION_STEM, COT_STEM_NOTHOUGHT, COT_KNOWLEDGE_COMPARE, TUTOR_INIT_INST, TUTOR_SEC_INST, ADVICE_EXAMPLES,ADVICE_AFTER_REFLECTION_EXAMPLES
+from prompt import  LAST_TRIAL_HEADER, COT_REFLECT_GT_HEADER, COT_FEVER,tutor_advice_follow_prompt_fever,tutor_advice_initial_prompt_fever,REFLECT_HEADER
+from prompt import cot_agent_prompt, cot_reflect_prompt, tutor_advice_initial_prompt, tutor_advice_follow_prompt,  COT_SIMPLE_HEADER
+from demonstration import COT_REFLECTION_STEM, COT_STEM_NOTHOUGHT,  TUTOR_INIT_INST, TUTOR_SEC_INST, ADVICE_EXAMPLES, ADVICE_AFTER_REFLECTION_EXAMPLES
 from random import choice
 
 class CoTAgent:
@@ -33,14 +30,12 @@ class CoTAgent:
                  selfcontradict_prompt: PromptTemplate = cot_reflect_prompt,
                  knowledge_contradict_prompt: PromptTemplate = cot_reflect_prompt,
 
-                 advice_initial_gpt_prompt: PromptTemplate = tutor_advice_initial_gpt_prompt,
-                 advice_follow_gpt_prompt: PromptTemplate = tutor_advice_follow_gpt_prompt,
+
                  advice_initial_prompt: PromptTemplate = tutor_advice_initial_prompt,
                  advice_follow_prompt: PromptTemplate = tutor_advice_follow_prompt,
 
                  cot_examples: str = COT_STEM_NOTHOUGHT,
                  reflect_examples: str = COT_REFLECTION_STEM,
-                 knowledge_examples: str = COT_KNOWLEDGE_COMPARE,
                  # auto_stop: int = 0,
                  self_reflect_llm= None,
                  action_llm= None):
@@ -63,16 +58,12 @@ class CoTAgent:
         self.knowledge_contradict_prompt = knowledge_contradict_prompt
         self.cot_examples = cot_examples
         self.reflect_examples = reflect_examples
-        self.knowledge_examples = knowledge_examples
         self.self_reflect_llm = self_reflect_llm
         self.action_llm = action_llm
         self.model_type = model_type
         self.tokenizer = tokenizer
         self.advice_type = advice_type
         self.dataset_name = dataset_name
-
-        self.advice_initial_gpt_prompt = advice_initial_gpt_prompt
-        self.advice_follow_gpt_prompt = advice_follow_gpt_prompt
 
         self.advice_initial_prompt = advice_initial_prompt  if self.dataset_name != 'fever' else tutor_advice_initial_prompt_fever
         self.advice_follow_prompt = advice_follow_prompt if self.dataset_name != 'fever' else tutor_advice_follow_prompt_fever
@@ -110,12 +101,9 @@ class CoTAgent:
             knowledge_contradict_prompt=copy.deepcopy(self.knowledge_contradict_prompt, memo),
             cot_examples=self.cot_examples,
             reflect_examples=self.reflect_examples,
-            knowledge_examples=self.knowledge_examples,
             self_reflect_llm=self.self_reflect_llm,
             action_llm=self.action_llm,
 
-            advice_initial_gpt_prompt=self.advice_initial_gpt_prompt,
-            advice_follow_gpt_prompt=self.advice_follow_gpt_prompt,
             advice_initial_prompt=self.advice_initial_prompt,
             advice_follow_prompt=self.advice_follow_prompt,
 
@@ -149,8 +137,6 @@ class CoTAgent:
             self.initial_advice = ''
         elif self.advice_type == 'fix':
             self.initial_advice = "Pay attention to the key elements in the question and enumerate each choice for careful consideration to select the most appropriate one."
-        # elif self.advice_type == 'gene_demo':
-        #     self.initial_advice = format_step(self.response_generate(self.self_reflect_llm, self._build_advice_initial_prompt()))
         else:
             self.initial_advice = format_step(self.response_generate(self.self_reflect_llm, self._build_advice_initial_prompt()))
 
@@ -304,10 +290,6 @@ class CoTAgent:
     def _build_reflection_prompt(self) -> str:
         if self.header_type == 0:
             _header=COT_REFLECT_GT_HEADER
-        elif self.header_type == 1:
-            _header=COT_REFLECT_GT_HEADER_1
-        elif self.header_type == 2:
-            _header=COT_REFLECT_GT_HEADER_2
 
         return self.reflect_prompt.format(
             header=_header,

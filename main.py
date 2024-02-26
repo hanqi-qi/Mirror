@@ -10,9 +10,9 @@ from tqdm import tqdm
 from datetime import datetime
 from agents_module import CoTAgent
 from evaluate import cut_tree_final
-from prompts import tutor_agent_prompt_fever, tutor_reflect_prompt_fever, tutor_agent_prompt, tutor_reflect_prompt
+from prompt import tutor_agent_prompt_fever, tutor_reflect_prompt_fever, tutor_agent_prompt, tutor_reflect_prompt
 from demonstration import TUTOR_REFLECTION_STEM, TUTOR_STEM,  TUTOR_STEM_NOADVCIE, COT_FEVER,TUTOR_REFLECTION_FEVER
-os.environ['OPENAI_API_KEY'] = ""
+os.environ['OPENAI_API_KEY'] = "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"
 
 
 
@@ -134,7 +134,7 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ckpt_dir', default="/scratch/prj/lmrep/llama2_model/Llama-2-13b-hf", type=str, required=False)
+    parser.add_argument('--ckpt_dir', default="your_model_path", type=str, required=False)
     parser.add_argument('--temperature', default=0.9, type=float, help='the diversity of generated text')
     parser.add_argument('--model_type', default="openai", type=str, required=False)
     parser.add_argument('--start_eid', default=0, type=int, required=False)
